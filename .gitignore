@@ -11,5 +11,7 @@ npm-debug.log
 yarn-error.log
 .idea
 .idea/*
+.idea/workspace.xml
 .DS_Store
 storage/*
+_ide_helper.php

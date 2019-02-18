@@ -12,6 +12,7 @@ class AppController extends Controller
 
     public function getApp()
     {
+        User::find( 100 );
         return view('app');
     }
 

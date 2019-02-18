@@ -13,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->sqlLog();
     }
 
     /**
@@ -26,5 +26,28 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment() !== 'production') {
             $this->app->register( \Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class );
         }
+    }
+
+    private function sqlLog()
+    {
+        \DB::listen( function( $query ){
+            $tmp = str_replace( '?', '"' . '%s' . '"', $query->sql );
+            $qBindings = [];
+            foreach( $query->bindings as $key => $value )
+            {
+                if( is_numeric( $key ) )
+                {
+                    $qBindings[] = $value;
+                }
+                else
+                {
+                    $tmp = str_replace( ':' . $key, $value, $tmp );
+                }
+            }
+            $tmp = vsprintf( $tmp, $qBindings );
+            $tmp = str_replace( "\\", "", $tmp );
+            \Log::channel( 'sql' )->info( ' execution time: ' . $query->time . 'ms; ' . $tmp . "\n\n\t" );
+        }
+        );
     }
 }
